@@ -11,6 +11,7 @@ var web3 = new Web3(
   new Web3.providers.HttpProvider('http://localhost:8545')
 );
 
+/*
 contract('Owned', function (accounts) {
   it("test", function () {
     var meta;
@@ -24,7 +25,7 @@ contract('Owned', function (accounts) {
     });
   });
 });
-
+*/
 
 
 /*
