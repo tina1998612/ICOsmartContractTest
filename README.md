@@ -20,7 +20,7 @@ contract('contract_name', function (accounts) {
     // your code here
 }
 ```
-5. Truffle uses the ![Mocha](https://mochajs.org) testing framework, so the syntax are much alike<br>
+5. Truffle uses the [Mocha](https://mochajs.org) testing framework, so the syntax are much alike<br>
 For example:<br>
 ```
 contract('contract_name', function (accounts) {
