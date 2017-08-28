@@ -116,6 +116,10 @@ contract('StatusContribution', function (accounts) {
   var SNT_address;
   var DynamicCeiling_address;
   var Status_instance;
+  var acc1_balance;
+  var acc2_balance;
+  var acc1_balance_after;
+  var acc2_balance_after;
 
   it("test", function () {
     MiniMeTokenFactory.deployed().then(function (instance) {
@@ -125,7 +129,6 @@ contract('StatusContribution', function (accounts) {
         SGT_address = instance.address;
         return SNT.new(MiniMeTokenFactory_address).then(function (SNT_instance) {
           SNT_address = SNT_instance.address;
-          console.log("hi");
           return DynamicCeiling.new(accounts[0], accounts[0]).then(function (instance) {
             DynamicCeiling_address = instance.address;
             return StatusContribution.deployed().then(function (instance) {
@@ -133,10 +136,44 @@ contract('StatusContribution', function (accounts) {
               return SNT_instance.changeController(Status_instance.address);
             }).then(function () {
               //console.log(SNT_address, DynamicCeiling_address);
-              return Status_instance.initialize(SNT_address, Status_instance.address, 610, 630, DynamicCeiling_address, accounts[0], accounts[0], accounts[0], accounts[0], SGT_address, 100);
+              //                                                                                                endBlock                                           where the contribution ether is sent
+              return Status_instance.initialize(SNT_address, Status_instance.address, web3.eth.blockNumber + 3, web3.eth.blockNumber + 20, DynamicCeiling_address, accounts[2], accounts[1], accounts[1], accounts[1], SGT_address, 100000);
+              //                                                     startBlock (+3 because the setGuaranteedAddress function requires blockNumber < stratBlock)                                                           
+            }).then(function () {
+              return web3.eth.getBalance(accounts[1]);
+            }).then(function (balance) {
+              acc1_balance = balance.toNumber();
+              return web3.eth.getBalance(accounts[2]);
+            }).then(function (balance) {
+              acc2_balance = balance.toNumber();
+              return Status_instance.startBlock.call();
+            }).then(function (data) {
+              console.log(data);
+              return Status_instance.endBlock.call();
+            }).then(function (data) {
+              console.log(data);
+              return Status_instance.setGuaranteedAddress(accounts[1], 1001);
+              /*
             }).then(function (receipt) {
-              console.log(receipt);
-            });
+              console.log(receipt.logs[0].args);
+              return web3.eth.sendTransaction({ from: accounts[0], to: accounts[1], value: 1000 });
+            }).then(function () {
+              return web3.eth.sendTransaction({ from: accounts[0], to: accounts[1], value: 1000 });
+              */
+            }).then(function () {
+              console.log(web3.eth.blockNumber);
+              return Status_instance.proxyPayment(accounts[1], { value: 1000 }); // apart from the token reciever's address, remember to specify the amount of money you want to pay for!
+            }).then(function (receipt) {
+              console.log(receipt.logs[0].args);
+              //console.log(Status_instance);
+              return Status_instance.guaranteedBuyersBought.call(accounts[1]); // call public variables with arguments, for ex. mapping
+            }).then(function (balance) {
+              acc1_balance_after = balance;
+              console.log(balance);
+              return Status_instance.totalGuaranteedCollected.call();
+            }).then(function (data) {
+              console.log(data);
+            })
           });
         });
       });
