@@ -3,9 +3,8 @@ Status ICO smart contract unit testing with the truffle framework (Internship pr
 
 ## Usage 
 1. open a separate terminal window and run `testrpc`
-2. run `truffle migrate` under this directory everytime you need to recompile or deploy a new contract
-3. run `truffle test` under this directory to execute the predefined test script
-4. To interact with your ethereum node, opened by testrpc, use the command `geth attach http://localhost:8545` on a separate terminal window (The default node running port is 8545)
+2. run `truffle test` under this directory to compile contracts and execute the predefined test script
+3. To interact with your ethereum node, opened by testrpc, use the command `geth attach http://localhost:8545` on a separate terminal window (The default node running port is 8545)
 
 ## For developers
 1. To deploy a new contract, first find the name of the contract that can be deployed under `build/contracts` 

@@ -115,10 +115,11 @@ contract('StatusContribution', function (accounts) {
   var SGT_address;
   var SNT_address;
   var DynamicCeiling_address;
+  var DynamicCeiling_contribution;
   var Status_instance;
   var contributeAmount = 1000;
 
-  it("test", function () {
+  it("contribute specific amount of money and get SNTs", function () {
     MiniMeTokenFactory.deployed().then(function (instance) {
       MiniMeTokenFactory_address = instance.address;
 
@@ -126,30 +127,38 @@ contract('StatusContribution', function (accounts) {
         SGT_address = instance.address;
         return SNT.new(MiniMeTokenFactory_address).then(function (SNT_instance) {
           SNT_address = SNT_instance.address;
-          return DynamicCeiling.new(accounts[0], accounts[0]).then(function (instance) {
-            DynamicCeiling_address = instance.address;
-            return StatusContribution.deployed().then(function (instance) {
-              Status_instance = instance;
-              return SNT_instance.changeController(Status_instance.address);
-            }).then(function () {
+
+          return StatusContribution.deployed().then(function (instance) {
+            Status_instance = instance;
+            return SNT_instance.changeController(Status_instance.address);
+          }).then(function () {
+            return DynamicCeiling.new(accounts[0], Status_instance.address).then(function (instance) {
+              DynamicCeiling_address = instance.address;
+              return instance.contribution.call();
+            }).then(function (contribution) {
+              DynamicCeiling_contribution = contribution;
               //console.log(SNT_address, DynamicCeiling_address);
               //                                                                                                endBlock                                           where the contribution ether is sent
-              return Status_instance.initialize(SNT_address, Status_instance.address, web3.eth.blockNumber + 3, web3.eth.blockNumber + 20, DynamicCeiling_address, accounts[2], accounts[1], accounts[1], accounts[1], SGT_address, 100000);
+              return Status_instance.initialize(SNT_address, Status_instance.address, web3.eth.blockNumber + 3, web3.eth.blockNumber + 30, DynamicCeiling_address, accounts[2], accounts[1], accounts[1], accounts[1], SGT_address, 100000);
               //                                                     startBlock (+3 because the setGuaranteedAddress function requires blockNumber < stratBlock)                                                           
             }).then(function () {
-              return Status_instance.setGuaranteedAddress(accounts[1], 1001);
+              return Status_instance.setGuaranteedAddress(accounts[3], 1001); // Note: you can set specific address to be able to contribute specific amount of money, otherwise the limit amount will be determined by dynamic ceiling 
             }).then(function () {
-              return Status_instance.proxyPayment(accounts[1], { value: contributeAmount }); // apart from the token reciever's address, remember to specify the amount of money you want to pay for!
+              return Status_instance.proxyPayment(accounts[3], { value: contributeAmount }); // apart from the token reciever's address, remember to specify the amount of money you want to pay for!
             }).then(function (receipt) {
               //console.log(receipt.logs[0].args);
               //console.log(Status_instance);
-              return Status_instance.guaranteedBuyersBought.call(accounts[1]); // call public variables with arguments, for ex. mapping
+              return Status_instance.guaranteedBuyersBought.call(accounts[3]); // call public variables with arguments, for ex. mapping
             }).then(function (buyAmount) {
               assert.equal(contributeAmount, buyAmount, "failed to contribute and get specific amount of SNTs");
               return Status_instance.totalGuaranteedCollected.call();
             }).then(function (totalMoneyCollected) {
               console.log(totalMoneyCollected);
-            })
+              return Status_instance.proxyPayment(accounts[0], { value: 2, gasPrice: 1 }); // note that this function links to buyNormal, which requires gasPrice < maxGasPrice, and the default gasPrice does not fulfill this statement
+              //return Status_instance.lastCallBlock.call(accounts[0]);
+            }).then(function (receipt) {
+              console.log(receipt);
+            });
           });
         });
       });

@@ -260,6 +260,8 @@ contract DynamicCeiling is Owned {
     /// @return Return the funds to collect for the current point on the curve
     ///  (or 0 if no curves revealed yet)
     function toCollect(uint256 collected) public onlyContribution returns (uint256) {
+        //return msg.sender;
+        
         if (revealedCurves == 0) return 0;
 
         // Move to the next curve
@@ -981,7 +983,7 @@ contract StatusContribution is Owned, TokenController {
     uint256 constant public maxGuaranteedLimit = 30000 ether;
     uint256 constant public exchangeRate = 10000;
     uint256 constant public maxGasPrice = 50000000000;
-    uint256 constant public maxCallFrequency = 100;
+    uint256 constant public maxCallFrequency = 0; // orginal value: 100
 
     MiniMeToken public SGT;
     MiniMeToken public SNT;
@@ -1153,6 +1155,8 @@ contract StatusContribution is Owned, TokenController {
     }
 
     function buyNormal(address _th) internal {
+        
+        
         require(tx.gasprice <= maxGasPrice);
 
         // Antispam mechanism
@@ -1166,9 +1170,10 @@ contract StatusContribution is Owned, TokenController {
         // Do not allow contracts to game the system
         require(!isContract(caller));
 
-        require(getBlockNumber().sub(lastCallBlock[caller]) >= maxCallFrequency);
+        require(getBlockNumber().sub(lastCallBlock[caller]) >= maxCallFrequency); // remember the first time it is executed, the block number should exceed 100
         lastCallBlock[caller] = getBlockNumber();
-
+        
+        
         uint256 toCollect = dynamicCeiling.toCollect(totalNormalCollected);
 
         uint256 toFund;
@@ -1180,6 +1185,7 @@ contract StatusContribution is Owned, TokenController {
 
         totalNormalCollected = totalNormalCollected.add(toFund);
         doBuy(_th, toFund, false);
+        
     }
 
     function buyGuaranteed(address _th) internal {
@@ -1195,6 +1201,7 @@ contract StatusContribution is Owned, TokenController {
         guaranteedBuyersBought[_th] = guaranteedBuyersBought[_th].add(toFund);
         totalGuaranteedCollected = totalGuaranteedCollected.add(toFund);
         doBuy(_th, toFund, true);
+        
     }
 
     function doBuy(address _th, uint256 _toFund, bool _guaranteed) internal {
