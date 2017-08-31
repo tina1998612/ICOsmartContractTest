@@ -980,7 +980,7 @@ contract StatusContribution is Owned, TokenController {
 
     uint256 constant public failSafeLimit = 300000 ether;
     uint256 constant public maxGuaranteedLimit = 30000 ether;
-    uint256 constant public exchangeRate = 10000;
+    uint256 constant public exchangeRate = 10000; // the amount of tokens per wei
     uint256 constant public maxGasPrice = 50000000000;
     uint256 constant public maxCallFrequency = 0; // orginal value: 100
 
@@ -1256,7 +1256,7 @@ contract StatusContribution is Owned, TokenController {
         require(finalizedBlock == 0);
 
         // Do not allow termination until all curves revealed.
-        require(dynamicCeiling.allRevealed());
+        //require(dynamicCeiling.allRevealed());
 
         // Allow premature finalization if final limit is reached
         if (getBlockNumber() <= endBlock) {
