@@ -1256,7 +1256,7 @@ contract StatusContribution is Owned, TokenController {
         require(finalizedBlock == 0);
 
         // Do not allow termination until all curves revealed.
-        //require(dynamicCeiling.allRevealed());
+        require(dynamicCeiling.allRevealed());
 
         // Allow premature finalization if final limit is reached
         if (getBlockNumber() <= endBlock) {
