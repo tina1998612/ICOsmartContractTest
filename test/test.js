@@ -41,17 +41,27 @@ contract('SNT', function (accounts) {
     });
   });
 
-  it("approve allowance from account one to account two", function () {
+  it("approve allowance from account one to account two and test transferring", function () {
     var meta;
     var amountToBeApproved = 100;
+    var transferAmount = 100;
+    var acc3_balance_before;
 
     return SNT.deployed().then(function (instance) {
       meta = instance;
       return meta.approve(accounts[1], amountToBeApproved);
-    }).then(function (receipt) {
+    }).then(function () {
+      return meta.balanceOf(accounts[3]);
+    }).then(function (balance) {
+      acc3_balance_before = balance.toNumber();
       return meta.allowance(accounts[0], accounts[1]);
     }).then(function (allowance) {
       assert.equal(allowance.toNumber(), amountToBeApproved, "approve allowance failed");
+      return meta.transferFrom(accounts[0], accounts[3], transferAmount, { from: accounts[1] });
+    }).then(function () {
+      return meta.balanceOf(accounts[3]);
+    }).then(function (balance) {
+      assert(balance.toNumber(), acc3_balance_before, "delegate transfer failed");
     });
   });
 
@@ -83,7 +93,6 @@ contract('SNT', function (accounts) {
       assert.equal(new_acc2_balance - amountToBeTransferred, acc2_balance, "money failed to transfer in");
     });
   });
-
 });
 
 
@@ -153,7 +162,7 @@ contract('StatusContribution', function (accounts) {
               assert.equal(totalTokenIssued.toNumber(), (contributeGuaranteedAmount + contributeNormalAmount) * exchangeRate, "tokens generated and contributed money not matched");
               return web3.eth.getBalance(accounts[2]);
             }).then(function (contributeEthSentWallet_after) {
-              assert.equal(contributeEthSentWallet_before + contributeGuaranteedAmount + contributeNormalAmount, contributeEthSentWallet_after, "balance in the contribution ether collecting wallet not match the amount of total contribution");
+              assert.equal(contributeEthSentWallet_before + contributeGuaranteedAmount + contributeNormalAmount, contributeEthSentWallet_after.toNumber(), "balance in the contribution ether collecting wallet not match the amount of total contribution");
             });
           });
         });
