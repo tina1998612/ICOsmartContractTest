@@ -1169,7 +1169,7 @@ contract StatusContribution is Owned, TokenController {
         // Do not allow contracts to game the system
         require(!isContract(caller));
 
-        require(getBlockNumber().sub(lastCallBlock[caller]) >= maxCallFrequency); // remember the first time it is executed, the block number should exceed 100
+        //require(getBlockNumber().sub(lastCallBlock[caller]) >= maxCallFrequency); // remember the first time it is executed, the block number should exceed 100
         lastCallBlock[caller] = getBlockNumber();
         
         
@@ -1182,9 +1182,9 @@ contract StatusContribution is Owned, TokenController {
         } else {
             toFund = toCollect;
         }
-        ClaimedTokens(_th, _th, toCollect);
         totalNormalCollected = totalNormalCollected.add(toFund);
         doBuy(_th, toFund, false);
+    
         
     }
 
@@ -1256,7 +1256,7 @@ contract StatusContribution is Owned, TokenController {
         require(finalizedBlock == 0);
 
         // Do not allow termination until all curves revealed.
-        require(dynamicCeiling.allRevealed());
+        //require(dynamicCeiling.allRevealed());
 
         // Allow premature finalization if final limit is reached
         if (getBlockNumber() <= endBlock) {

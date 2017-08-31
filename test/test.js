@@ -134,7 +134,7 @@ contract('StatusContribution', function (accounts) {
             }).then(function (balance) {
               contributeEthSentWallet_before = balance.toNumber();
               startBlock = web3.eth.blockNumber + 3; //+3 because the setGuaranteedAddress function requires blockNumber < stratBlock
-              endBlock = startBlock + 10; // any number it is bigger than startBlock
+              endBlock = startBlock + 1; // any number it is bigger than startBlock
               //                                                                                                                    where the contribution ether is sent
               return Status_instance.initialize(SNT_address, Status_instance.address, startBlock, endBlock, DynamicCeiling_address, accounts[2], accounts[1], accounts[1], accounts[1], SGT_address, 100000);
             }).then(function () {
@@ -147,12 +147,12 @@ contract('StatusContribution', function (accounts) {
               assert.equal(contributeGuaranteedAmount, buyAmount, "failed to get wanted amount of SNTs");
               return Status_instance.totalGuaranteedCollected.call();
             }).then(function (totalMoneyCollected) {
-              assert.equal(totalMoneyCollected, contributeGuaranteedAmount, "failed to contribute the wanted amount(guaranteed address)");
+              assert.equal(totalMoneyCollected.toNumber(), contributeGuaranteedAmount, "failed to contribute the wanted amount(guaranteed address)");
               return Status_instance.proxyPayment(accounts[0], { value: contributeNormalAmount, gasPrice: 1 }); // note that this function links to buyNormal, which requires gasPrice < maxGasPrice, and the default gasPrice does not fulfill this statement
             }).then(function (receipt) {
               return Status_instance.totalNormalCollected.call();
             }).then(function (totalMoneyCollected) {
-              assert.equal(totalMoneyCollected, contributeNormalAmount, "failed to contribute the wanted amount(normal address)");
+              assert.equal(totalMoneyCollected.toNumber(), contributeNormalAmount, "failed to contribute the wanted amount(normal address)");
               return Status_instance.exchangeRate.call();
             }).then(function (_exchangeRate) {
               exchangeRate = _exchangeRate.toNumber();
@@ -163,6 +163,11 @@ contract('StatusContribution', function (accounts) {
               return web3.eth.getBalance(accounts[2]);
             }).then(function (contributeEthSentWallet_after) {
               assert.equal(contributeEthSentWallet_before + contributeGuaranteedAmount + contributeNormalAmount, contributeEthSentWallet_after.toNumber(), "balance in the contribution ether collecting wallet not match the amount of total contribution");
+              return web3.eth.sendTransaction({ from: accounts[0], to: accounts[1], value: 100 });
+            }).then(function (receipt) {
+              return Status_instance.finalize();
+            }).then(function (receipt) {
+              assert.equal(receipt.logs[0].event, 'Finalized', "contribution finalization failed");
             });
           });
         });
