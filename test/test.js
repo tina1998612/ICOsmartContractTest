@@ -114,10 +114,12 @@ contract('StatusContribution', function (accounts) {
   var MiniMeTokenFactory_address;
   var SGT_address;
   var SNT_address;
+  var DynamicCeiling_contract;
   var DynamicCeiling_address;
   var DynamicCeiling_contribution;
   var Status_instance;
-  var contributeAmount = 1000;
+  var contributeGuaranteedAmount = 1000;
+  var contributeNormalAmount = 100;
 
   it("contribute specific amount of money and get SNTs", function () {
     MiniMeTokenFactory.deployed().then(function (instance) {
@@ -133,8 +135,9 @@ contract('StatusContribution', function (accounts) {
             return SNT_instance.changeController(Status_instance.address);
           }).then(function () {
             return DynamicCeiling.new(accounts[0], Status_instance.address).then(function (instance) {
-              DynamicCeiling_address = instance.address;
-              return instance.contribution.call();
+              DynamicCeiling_contract = instance;
+              DynamicCeiling_address = DynamicCeiling_contract.address;
+              return DynamicCeiling_contract.contribution.call();
             }).then(function (contribution) {
               DynamicCeiling_contribution = contribution;
               //console.log(SNT_address, DynamicCeiling_address);
@@ -144,21 +147,25 @@ contract('StatusContribution', function (accounts) {
             }).then(function () {
               return Status_instance.setGuaranteedAddress(accounts[3], 1001); // Note: you can set specific address to be able to contribute specific amount of money, otherwise the limit amount will be determined by dynamic ceiling 
             }).then(function () {
-              return Status_instance.proxyPayment(accounts[3], { value: contributeAmount }); // apart from the token reciever's address, remember to specify the amount of money you want to pay for!
+              return Status_instance.proxyPayment(accounts[3], { value: contributeGuaranteedAmount }); // apart from the token reciever's address, remember to specify the amount of money you want to pay for!
             }).then(function (receipt) {
               //console.log(receipt.logs[0].args);
               //console.log(Status_instance);
               return Status_instance.guaranteedBuyersBought.call(accounts[3]); // call public variables with arguments, for ex. mapping
             }).then(function (buyAmount) {
-              assert.equal(contributeAmount, buyAmount, "failed to contribute and get specific amount of SNTs");
+              assert.equal(contributeGuaranteedAmount, buyAmount, "failed to get wanted amount of SNTs");
               return Status_instance.totalGuaranteedCollected.call();
             }).then(function (totalMoneyCollected) {
-              console.log(totalMoneyCollected);
-              return Status_instance.proxyPayment(accounts[0], { value: 2, gasPrice: 1 }); // note that this function links to buyNormal, which requires gasPrice < maxGasPrice, and the default gasPrice does not fulfill this statement
+              //console.log(totalMoneyCollected);
+              assert.equal(totalMoneyCollected, contributeGuaranteedAmount, "failed to contribute the wanted amount(guaranteed address)")
+              return Status_instance.proxyPayment(accounts[0], { value: contributeNormalAmount, gasPrice: 1 }); // note that this function links to buyNormal, which requires gasPrice < maxGasPrice, and the default gasPrice does not fulfill this statement
               //return Status_instance.lastCallBlock.call(accounts[0]);
             }).then(function (receipt) {
-              console.log(receipt);
-            });
+              //console.log(receipt.logs[0].args);
+              return Status_instance.totalNormalCollected.call();
+            }).then(function (totalMoneyCollected) {
+              assert.equal(totalMoneyCollected, contributeNormalAmount, "failed to contribute the wanted amount(normal address)");
+            })
           });
         });
       });

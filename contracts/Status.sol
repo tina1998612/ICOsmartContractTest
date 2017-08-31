@@ -205,7 +205,6 @@ contract DynamicCeiling is Owned {
         for (uint256 i = 0; i < _curveHashes.length; i = i.add(1)) {
             curves[i].hash = _curveHashes[i];
         }
-
     }
 
 
@@ -1174,7 +1173,8 @@ contract StatusContribution is Owned, TokenController {
         lastCallBlock[caller] = getBlockNumber();
         
         
-        uint256 toCollect = dynamicCeiling.toCollect(totalNormalCollected);
+        //uint256 toCollect = dynamicCeiling.toCollect(totalNormalCollected);
+        uint256 toCollect = 1000;
 
         uint256 toFund;
         if (msg.value <= toCollect) {
@@ -1182,7 +1182,7 @@ contract StatusContribution is Owned, TokenController {
         } else {
             toFund = toCollect;
         }
-
+        ClaimedTokens(_th, _th, toCollect);
         totalNormalCollected = totalNormalCollected.add(toFund);
         doBuy(_th, toFund, false);
         
