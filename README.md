@@ -12,8 +12,8 @@ Status ICO smart contract unit testing with the truffle framework
 For example, if the contract name is `Owned`:<br>
 Create a contract object by adding this line `var Owned = artifacts.require("Owned")` to this file, and add `deployer.deploy(Owned)` inside `module.exports` function 
 3. In the `test.js script` located under the `test` folder, ceate the contract object again by adding `var Owned = artifacts.require("Owned")` on the top lines 
-4. Truffle allows you to test contracts one by one and gives ten accounts (wallet address) to each contract initially. The accounts created here are with special settings, so you can use them directly without caring when to unlock the account. <br>
-The syntax:<br>
+4. Truffle allows you to test contracts one by one given default accounts/wallet address (In this case, it's the 10 accounts created by testrpc). The accounts created here are with special settings, so you can use them directly without caring when to unlock the account. <br>
+Syntax:<br>
 ```javascript
 contract('contract_name', function (accounts) {
     // your code here
@@ -25,6 +25,7 @@ For example:<br>
 contract('contract_name', function (accounts) {
     it('the_name_of_the_first_unit_test', function(){
         // your code here
+        assert.equal(123, 123, "This message will not show if the first two values are equaled!");
     });
     it('the_name_of_the_second_unit_test', function(){
         // your code here
