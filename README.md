@@ -1,5 +1,5 @@
-# MXB--smartContractTest
-Status ICO smart contract unit testing with the truffle framework (Internship project)
+# Overview
+Status ICO smart contract unit testing with the truffle framework
 
 ## Usage 
 1. open a separate terminal window and run `testrpc`
