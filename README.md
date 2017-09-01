@@ -1,12 +1,12 @@
 # Overview
-Status ICO smart contract unit testing with the truffle framework
+Status ICO smart contract unit testing with the truffle framework. To simplify, I made some adjustment to the [original source code](https://etherscan.io/address/0x55d34b686aa8c04921397c5807db9ecedba00a4c#code) to diable dynamic ceiling here. 
 
-## Usage 
+# Usage 
 1. open a separate terminal window and run `testrpc`
 2. run `truffle test` under this directory to compile contracts and execute the predefined test script
 3. To interact with your ethereum node, opened by testrpc, use the command `geth attach http://localhost:8545` on a separate terminal window (The default node running port is 8545)
 
-## For developers
+# For developers
 1. To deploy a new contract, first find the name of the contract that can be deployed under `build/contracts` 
 2. Edit `migrations/2_deploy_contracts.js` where you can specify what contract you want to deploy. <br>
 For example, if the contract name is `Owned`:<br>
