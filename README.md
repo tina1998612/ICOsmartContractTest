@@ -14,14 +14,14 @@ Create a contract object by adding this line `var Owned = artifacts.require("Own
 3. In the `test.js script` located under the `test` folder, ceate the contract object again by adding `var Owned = artifacts.require("Owned")` on the top lines 
 4. Truffle allows you to test contracts one by one and gives ten accounts (wallet address) to each contract initially. The accounts created here are with special settings, so you can use them directly without caring when to unlock the account. <br>
 The syntax:<br>
-``` 
+```javascript
 contract('contract_name', function (accounts) {
     // your code here
 }
 ```
 5. Truffle uses the [Mocha](https://mochajs.org) testing framework, so the syntax are much alike<br>
 For example:<br>
-```
+```javascript
 contract('contract_name', function (accounts) {
     it('the_name_of_the_first_unit_test', function(){
         // your code here
