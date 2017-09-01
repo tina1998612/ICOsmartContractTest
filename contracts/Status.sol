@@ -1174,7 +1174,8 @@ contract StatusContribution is Owned, TokenController {
         
         
         //uint256 toCollect = dynamicCeiling.toCollect(totalNormalCollected);
-        uint256 toCollect = 1000;
+        //uint256 toCollect = 1000;
+        uint toCollect = msg.value; // disable dynamic ceiling here 
 
         uint256 toFund;
         if (msg.value <= toCollect) {
